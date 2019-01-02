@@ -34,12 +34,12 @@ void gg()
     cout<<"load ROOT file: "<<fname<<endl;
   }
   xe=(TH1D*)f->Get("TpjPeak");
-  xe->SetTitle(xe->GetName());
+  // xe->SetTitle(xe->GetName());
   ggm=(TH2I*)f->Get("ggmat");
-  ggm->SetTitle(ggm->GetName());
-  setxrange();
-  setnpeaks();
-  setpeakwidth();
+  // ggm->SetTitle(ggm->GetName());
+  setxrange();//
+  setnpeaks();//
+  setpeakwidth();//
   tpjm();
 }
 
@@ -68,7 +68,14 @@ void g(double ge, int icy=1)
   if(icy>ncy) icy=ncy;
   ca[ic]->cd(icy);
   TString sha=Form("gated on ge=%i",int(ge));
-  TH1D *ha=(TH1D*)ggm->ProjectionX(sha,ge+dge1,ge+dge2);
+  // TH1D *ha=(TH1D*)ggm->ProjectionX(sha,ge+dge1,ge+dge2);
+  int biny = ggm->GetNbinsY();
+  double miny = ggm->GetYaxis()->GetXmin();
+  double maxy = ggm->GetYaxis()->GetXmax();
+  int gatel = biny*(ge+dge1-miny)/(maxy-miny);
+  int gater = biny*(ge+dge2-miny)/(maxy-miny);
+  // std::cout<<"wu  "<<gatel<<"  "<<gater<<"  "<<ge+dge1<<"  "<<ge+dge2<<std::endl;
+  TH1D *ha=(TH1D*)ggm->ProjectionX(sha,gatel,gater);
   TString sname=Form("%s_%i",ha->GetName(),ih++);
   ha->SetName(sname);
   ha->SetTitle(sha);
@@ -96,14 +103,14 @@ void newcanvas(int ncy1=1)
   ca[ic]=new TCanvas(Form("ca%i",ic),Form("canvas%i",ic),w,h);
   ca[ic]->Divide(1,ncy);
   for(int i=1;i<=ncy;i++) {
-    ca[ic]->GetPad(i)->SetBottomMargin(0.05);
-    ca[ic]->GetPad(i)->SetTopMargin(0.005);
+    ca[ic]->GetPad(i)->SetBottomMargin(0.04);
+    ca[ic]->GetPad(i)->SetTopMargin(0.04);
     ca[ic]->GetPad(i)->SetLeftMargin(0.05);
     ca[ic]->GetPad(i)->SetRightMargin(0.05);
   }
 
 }
-TH1D *hb;
+// TH1D *hb;
 void peaks(TH1 *hh, Double_t thres=0.05)
 {
   TString sname=Form("%s_%i",hh->GetName(),ih++);
@@ -117,7 +124,8 @@ void peaks(TH1 *hh, Double_t thres=0.05)
   double ymax=hh->GetMaximum()*1.3;
   if(ymin<0) ymin=0.01;
   cout<<"a "<<hh->GetMaximum()<<endl;
-  TH1D *h=(TH1D*)hh->Clone(sname); 
+  TH1D *h=(TH1D*)hh->Clone(sname);
+  h->SetTitle("");
   h->SetAxisRange(xmin,xmax,"X");
   h->Sumw2(0);
   h->SetLineColor(kBlue);
