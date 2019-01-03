@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 16:47:02 2019 (+0800)
-// Last-Updated: 四 1月  3 16:46:36 2019 (+0800)
+// Last-Updated: 四 1月  3 16:56:07 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 41
+//     Update #: 43
 // URL: http://wuhongyi.cn 
 
 #include "ggMainFrame.hh"
@@ -181,7 +181,8 @@ void ggMainFrame::HandleReturn()
     }
   else if(flagcommand=="g" || flagcommand=="gate")
     {
-      std::cout<<"Command gate not defind."<<std::endl;
+      *fTextView<<"Command gate not defind."<<std::endl;
+      // std::cout<<"Command gate not defind."<<std::endl;
     }
   else if(flagcommand=="gm")
     {
@@ -189,10 +190,10 @@ void ggMainFrame::HandleReturn()
       double ge[100];
       while(ss >> ge[mhit])
 	{
-	  std::cout<<"gate: "<<ge[mhit]<<std::endl;
+	  // std::cout<<"gate: "<<ge[mhit]<<std::endl;
 	  mhit++;
 	}
-      std::cout<<"mhit: "<<mhit<<std::endl;
+      // std::cout<<"mhit: "<<mhit<<std::endl;
 
       switch(mhit)
 	{

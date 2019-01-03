@@ -4,9 +4,9 @@
 # Author: Hongyi Wu(吴鸿毅)
 # Email: wuhongyi@qq.com 
 # Created: 六 2月 22 19:39:08 2014 (+0800)
-# Last-Updated: 三 1月  2 20:53:17 2019 (+0800)
+# Last-Updated: 四 1月  3 16:52:11 2019 (+0800)
 #           By: Hongyi Wu(吴鸿毅)
-#     Update #: 115
+#     Update #: 116
 # URL: http://wuhongyi.cn 
 
 #在当前目录打开终端，输入        cmake .[Enter]   make
@@ -42,7 +42,7 @@ add_executable(${PROJ_NAME} main.cc ${sources} ${headers})
 target_link_libraries(${PROJ_NAME} ggClassDict ${libs} ${ROOT_LIBRARIES} )
 #----------------------------------------------------------------------------
 set(CopyFile
-    rootlogon.C rootlogoff.C xia.root
+    rootlogon.C rootlogoff.C
   )
 
 foreach(copyfile ${CopyFile})
