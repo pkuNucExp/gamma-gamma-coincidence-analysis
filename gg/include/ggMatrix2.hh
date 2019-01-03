@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 20:30:18 2019 (+0800)
-// Last-Updated: 四 1月  3 10:43:39 2019 (+0800)
+// Last-Updated: 四 1月  3 13:24:23 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 21
+//     Update #: 22
 // URL: http://wuhongyi.cn 
 
 #ifndef _GGMATRIX2_H_
@@ -42,6 +42,13 @@ public:
   void SetPeaksThreshold(double thres);//eg: 0.05
   void SetXRangeUser(double xmin,double xmax);
 
+
+  int GetNPeaks();
+  double GetPeaksThreshold();
+  void GetPeakWidth(double &left,double &right);
+  void GetXRangeUser(double &xmin,double &xmax);
+
+  
   void PeaksFlag(TH1 *h,TString st = "");
 private:
   TH1 *gTpj;

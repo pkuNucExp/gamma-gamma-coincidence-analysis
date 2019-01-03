@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 20:30:37 2019 (+0800)
-// Last-Updated: 四 1月  3 10:52:03 2019 (+0800)
+// Last-Updated: 四 1月  3 13:24:25 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 35
+//     Update #: 37
 // URL: http://wuhongyi.cn 
 
 #include "ggMatrix2.hh"
@@ -75,6 +75,24 @@ void ggMatrix2::SetXRangeUser(double xmin,double xmax)
     }
 }
 
+int ggMatrix2::GetNPeaks()
+{
+  return NoPeaks;
+}
+double ggMatrix2::GetPeaksThreshold()
+{
+  return PeaksThreshold;
+}
+void ggMatrix2::GetPeakWidth(double &left,double &right)
+{
+  left = PeakWidthLeft;
+  right =PeakWidthRight;
+}
+void ggMatrix2::GetXRangeUser(double &xmin,double &xmax)
+{
+  xmin = UserMinX;
+  xmax = UserMaxX;
+}
 
 void ggMatrix2::ShowTotalProject()
 {
@@ -86,7 +104,7 @@ void ggMatrix2::ShowTotalProject()
   gTpj->SetBinContent(gTpj->GetNbinsX()+1,0);
   TH1D *h = (TH1D*)gTpj->Clone(sname);
   // h->SetTitle(xe->GetTitle());
-  PeaksFlag(h);
+  PeaksFlag(h,"TpjPeak");
   SetXRangeUser(-1,-1);
 }
 

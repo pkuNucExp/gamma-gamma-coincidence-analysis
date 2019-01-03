@@ -4,14 +4,21 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 16:47:02 2019 (+0800)
-// Last-Updated: 四 1月  3 10:57:20 2019 (+0800)
+// Last-Updated: 四 1月  3 16:46:36 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 31
+//     Update #: 41
 // URL: http://wuhongyi.cn 
 
 #include "ggMainFrame.hh"
 
 ClassImp(ggMainFrame);
+
+const char *dnd_types[] =
+  {
+   "ROOT files",    "*.root",
+   "All files",     "*",
+   0,               0
+  };
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 ggMainFrame::ggMainFrame()
   : TGMainFrame(gClient->GetRoot())
@@ -20,6 +27,8 @@ ggMainFrame::ggMainFrame()
   ggmatrix2 = NULL;
   ggm = NULL;
   xe = NULL;
+
+  // gFileDir = ".";
   //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
   
   MainFrame();
@@ -38,21 +47,27 @@ void ggMainFrame::MainFrame()
 
   // Contents
   fContents = new TGVerticalFrame(this);
-  fButtons = new TGHorizontalFrame(fContents);
+  AddFrame(fContents, new TGLayoutHints(kLHintsTop | kLHintsExpandX | kLHintsExpandY));
+  
 
   // TextView
   fTextView = new TGTextViewostream(fContents, 500, 300);
   fContents->AddFrame(fTextView, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 5, 5, 5, 0));
 
+
+  
   fCommandFrame = new TGHorizontalFrame(fContents);
+  fContents->AddFrame(fCommandFrame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
   fCommand = new TGTextEntry(fCommandFrame, (const char *)"", 20);
   fCommand->Connect("ReturnPressed()", "ggMainFrame", this, "HandleReturn()");
   fCommandFrame->AddFrame(new TGLabel(fCommandFrame, "Command: "),
 			  new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 5, 5, 5, 5));
   fCommandFrame->AddFrame(fCommand, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
-  fContents->AddFrame(fCommandFrame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
 
+  
   // The button for test
+  fButtons = new TGHorizontalFrame(fContents);
+  fContents->AddFrame(fButtons, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 0, 0, 0, 0));
   fReset = new TGTextButton(fButtons, "&Reset");
   fReset->SetToolTipText("Press to clear the command entry\nand the TGTextView", 200);
   fReset->Connect("Clicked()", "ggMainFrame", this, "Reset()");
@@ -63,14 +78,17 @@ void ggMainFrame::MainFrame()
   fButtons->AddFrame(fExit, new TGLayoutHints(kLHintsExpandX | kLHintsTop, 5, 5, 5, 5));
   fExit->Connect("Pressed()", "TApplication", gApplication, "Terminate()");
 
-  fContents->AddFrame(fButtons, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 0, 0, 0, 0));
+  
+
+  
   Connect("CloseWindow()", "TApplication", gApplication, "Terminate()");
   DontCallClose();
 
-  AddFrame(fContents, new TGLayoutHints(kLHintsTop | kLHintsExpandX | kLHintsExpandY));
+  
   MapSubwindows();
   Resize(GetDefaultSize());
 
+  
   SetWindowName("g-g coincidence analysis");
   MapRaised();
 }
@@ -80,12 +98,14 @@ void ggMainFrame::Reset()
   fCommand->Clear();
   fTextView->Clear();
 
-  if(fileraw != NULL) delete fileraw;
-  TString fname="xia.root";//filename;
-  fileraw = new TFile(fname);
-  std::cout<<"Load ROOT file: "<<fname<<std::endl;
+  LoadFile();
 
-  *fTextView<<"Load ROOT file: "<<fname<<std::endl;
+  
+  if(fileraw != NULL) delete fileraw;
+  fileraw = new TFile(gRootFileName.Data());
+  std::cout<<"Load ROOT file: "<<gRootFileName<<std::endl;
+
+  *fTextView<<"Load ROOT file: "<<gRootFileName<<std::endl;
 
   xe = (TH1D*)fileraw->Get("TpjPeak");
   // xe->SetTitle(xe->GetName());
@@ -95,11 +115,21 @@ void ggMainFrame::Reset()
   
   if(ggmatrix2 != NULL) delete ggmatrix2;
   ggmatrix2 = new ggMatrix2(ggm,xe);
-
-
-
-  
 }
+
+void ggMainFrame::LoadFile()
+{
+  static TString gFileDir(".");
+  TGFileInfo fi;
+  fi.fFileTypes = dnd_types;
+  fi.fIniDir    = StrDup(gFileDir);
+
+  new TGFileDialog(gClient->GetRoot(), this, kFDOpen, &fi);
+  gFileDir = fi.fIniDir;
+
+  gRootFileName = fi.fFilename;
+}
+
 
 void ggMainFrame::HandleReturn()
 {
@@ -144,7 +174,8 @@ void ggMainFrame::HandleReturn()
 	}
       else
 	{
-	  *fTextView<<"Invalid range."<<std::endl;
+	  ggmatrix2->SetXRangeUser(-1,-1);
+	  *fTextView<<"Invalid range. To all range."<<std::endl;
 	}
       
     }
@@ -231,6 +262,23 @@ void ggMainFrame::HandleReturn()
 	{
 	  *fTextView<<"Invalid peak threshold."<<std::endl;
 	}
+    }
+  else if(flagcommand=="pars")
+    {
+      *fTextView<<"----------pars---------"<<std::endl;
+      *fTextView<<"No. peaks: "<<ggmatrix2->GetNPeaks()<<std::endl;
+      *fTextView<<"Peaks threshold: "<<ggmatrix2->GetPeaksThreshold()<<std::endl;
+      double temp1,temp2;
+      ggmatrix2->GetPeakWidth(temp1,temp2);
+      *fTextView<<"Peaks width: "<<temp1<<"  "<<temp2<<std::endl;
+      ggmatrix2->GetXRangeUser(temp1,temp2);
+      *fTextView<<"User's range: "<<temp1<<"  "<<temp2<<std::endl;
+      *fTextView<<"----------pars---------"<<std::endl;
+    }
+  else if(flagcommand=="help")
+    {
+      *fTextView<<"----------help---------"<<std::endl;
+      
     }
   else
     {
