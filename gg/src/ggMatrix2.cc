@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 20:30:37 2019 (+0800)
-// Last-Updated: 三 1月  2 22:26:34 2019 (+0800)
+// Last-Updated: 四 1月  3 10:52:03 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 14
+//     Update #: 35
 // URL: http://wuhongyi.cn 
 
 #include "ggMatrix2.hh"
@@ -41,7 +41,7 @@ ggMatrix2::~ggMatrix2()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void ggMatrix2::SetNoPeaks(int n)
+void ggMatrix2::SetNPeaks(int n)
 {
   // TODO 添加参数合理性判断
   NoPeaks = n;
@@ -82,11 +82,39 @@ void ggMatrix2::ShowTotalProject()
 
   ca[ic]->cd(1);
   TString sname = TString::Format("%s_%i",gTpj->GetName(),ih++);
+  gTpj->SetBinContent(0,0);
+  gTpj->SetBinContent(gTpj->GetNbinsX()+1,0);
   TH1D *h = (TH1D*)gTpj->Clone(sname);
   // h->SetTitle(xe->GetTitle());
-  // peaks(h);
   PeaksFlag(h);
   SetXRangeUser(-1,-1);
+}
+
+void ggMatrix2::ShowGated(double ge, int icy)
+{
+  if(icy > ncy) icy = ncy;
+  ca[ic]->cd(icy);
+
+  // TODO 需要优化bin的取值舍入
+  int gatel = gBinY*(ge+PeakWidthLeft-gMinY)/(gMaxY-gMinY);
+  int gater = gBinY*(ge+PeakWidthRight-gMinY)/(gMaxY-gMinY);
+
+  TH1D *ha = (TH1D*)gMat->ProjectionX(TString::Format("%s_%i",ha->GetName(),ih++).Data(),gatel,gater);
+  ha->SetBinContent(0,0);
+  ha->SetBinContent(ha->GetNbinsX()+1,0);
+
+  PeaksFlag(ha,TString::Format("Gated on ge=%0.1f,bin %d to %d",ge,gatel,gater));
+}
+
+void ggMatrix2::ShowGatedMulti(double ge1,double ge2,double ge3,double ge4, double ge5,double ge6)
+{
+  int npad = 0;
+  double ge[6] = {ge1,ge2,ge3,ge4,ge5,ge6};
+  for(int i=0;i<6;i++) 
+    if(ge[i]>1) npad++;
+  NewCanvas(npad);
+  for(int i=0;i<npad;i++)
+    ShowGated(ge[i],i+1);
 }
 
 void ggMatrix2::NewCanvas(int ncy1)
@@ -107,58 +135,65 @@ void ggMatrix2::NewCanvas(int ncy1)
     }
 }
 
-void ggMatrix2::PeaksFlag(TH1 *hh)
+void ggMatrix2::PeaksFlag(TH1 *h,TString st)
 {
-  // TString sname=Form("%s_%i",hh->GetName(),ih++);
-  // // double x0=hh->GetBinLowEdge(hh->GetNbinsX());
-  // // double x1=hh->GetBinLowEdge(0);
-  // // if(xmin<x1) xmin=x1;
-  // // if(xmax>x0) xmax=x0;
-  // // hh->SetAxisRange(xmin,xmax,"X");
-  // // hh->Print("all");
-  // double ymin=hh->GetMinimum();
-  // double ymax=hh->GetMaximum()*1.3;
-  // if(ymin<0) ymin=0.01;
-  // cout<<"a "<<hh->GetMaximum()<<endl;
-  // TH1D *h=(TH1D*)hh->Clone(sname);
-  // h->SetTitle("");
-  // h->SetAxisRange(xmin,xmax,"X");
-  // h->Sumw2(0);
-  // h->SetLineColor(kBlue);
-  // h->SetFillColor(kCyan);
-  // TSpectrum *s=new TSpectrum(500);
-  // h->SetAxisRange(ymin,ymax,"Y");
-  // h->SetStats(0);
-  // Int_t nfound=100;
-  // Int_t nloop=0;
-  // while(nloop<50){
-  //   nfound=s->Search(h,2,"",PeaksThreshold);
-  //   if(nfound>npeaks) PeaksThreshold += 0.005;
-  //   else PeaksThreshold -= 0.005;
-  //   if(PeaksThreshold<0 || abs(nfound-npeaks)<3 ) break;
-  //   nloop++;
-  // }
-  // // cout<<nfound<<" peaks have been found."<<endl;
-  // TPolyMarker *pm=(TPolyMarker *)
-  //   h->GetListOfFunctions()->FindObject("TPolyMarker");
-  // cout<<"pm:"<<pm<<endl;
-  // pm->SetMarkerStyle(32);
-  // pm->SetMarkerColor(kGreen);
-  // pm->SetMarkerSize(0.4);
-  // Double_t *xpeaks=s->GetPositionX();
-  // Double_t *ypeaks=s->GetPositionY();
-  // for(int j=0;j<nfound;j++) {
-  //   stringstream ss;
-  //   ss<<xpeaks[j];
-  //   TString s1=ss.str();
-  //   TLatex *tex=new TLatex(xpeaks[j],ypeaks[j],s1);
-  //   tex->SetTextFont(13);
-  //   tex->SetTextSize(13);
-  //   tex->SetTextAlign(12);
-  //   tex->SetTextAngle(90);
-  //   tex->SetTextColor(kRed);
-  //   tex->Draw();
-  // }
+  h->SetAxisRange(UserMinX,UserMaxX,"X");
+  // hh->Print("all");
+  double ymin = h->GetMinimum();
+  double ymax = h->GetMaximum()*1.3;
+  if(ymin < 0) ymin = 0.01;
+  // std::cout<<"a "<<h->GetMaximum()<<std::endl;
+  h->SetTitle("");
+
+  h->Sumw2(0);
+  h->SetLineColor(kBlue);
+  h->SetFillColor(kCyan);
+  TSpectrum *s = new TSpectrum(500);
+  h->SetAxisRange(ymin,ymax,"Y");
+  h->SetStats(0);
+  Int_t nfound = 100;
+  Int_t nloop = 0;
+  while(nloop < 50)
+    {
+      nfound=s->Search(h,2,"",PeaksThreshold);
+      if(nfound > NoPeaks) PeaksThreshold += 0.005;
+      else PeaksThreshold -= 0.005;
+      if(PeaksThreshold<0 || TMath::Abs(nfound-NoPeaks)<3 ) break;
+      nloop++;
+    }
+  // cout<<nfound<<" peaks have been found."<<endl;
+  TPolyMarker *pm=(TPolyMarker *)
+    h->GetListOfFunctions()->FindObject("TPolyMarker");
+  // std::cout<<"pm:"<<pm<<std::endl;
+  pm->SetMarkerStyle(32);
+  pm->SetMarkerColor(kGreen);
+  pm->SetMarkerSize(0.4);
+  Double_t *xpeaks = s->GetPositionX();
+  Double_t *ypeaks = s->GetPositionY();
+  for(int j = 0; j < nfound; j++)
+    {
+    std::stringstream ss;
+    ss<<xpeaks[j];
+    TString s1=ss.str();
+    TLatex *tex = new TLatex(xpeaks[j],ypeaks[j],s1);
+    tex->SetTextFont(13);
+    tex->SetTextSize(13);
+    tex->SetTextAlign(12);
+    tex->SetTextAngle(90);
+    tex->SetTextColor(kRed);
+    tex->Draw();
+  }
+
+  if(st != "")
+    {
+      TLatex *ltx=new TLatex();
+      ltx->SetNDC(kTRUE);
+      ltx->SetTextColor(1);
+      ltx->SetTextFont(22);
+      ltx->SetTextSize(0.05);
+      ltx->DrawLatex(0.5,0.9,st.Data());
+      delete ltx;
+    }
 }
 
 

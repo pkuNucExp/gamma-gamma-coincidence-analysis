@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 16:47:02 2019 (+0800)
-// Last-Updated: 三 1月  2 22:21:10 2019 (+0800)
+// Last-Updated: 四 1月  3 10:57:20 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 17
+//     Update #: 31
 // URL: http://wuhongyi.cn 
 
 #include "ggMainFrame.hh"
@@ -111,7 +111,133 @@ void ggMainFrame::HandleReturn()
   //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
   // TODO
 
-  ggmatrix2->ShowTotalProject();
+  if(ggmatrix2 == NULL) return;
+  
+  std::string flagcommand;
+  
+  std::stringstream ss(command);
+  ss>>flagcommand;
+
+  if(flagcommand=="nc" || flagcommand=="newcanvas")
+    {
+      // std::cout<<"Command: nc"<<std::endl;
+      int ncy1 = 0;
+      ss >> ncy1;
+      if(ncy1 > 0)
+	{
+	  ggmatrix2->NewCanvas(ncy1);
+	}
+      else
+	{
+	  *fTextView<<"Invalid canvas number."<<std::endl;
+	}
+      
+    }
+  else if(flagcommand=="sr" || flagcommand=="setrange")
+    {
+      double ul = -1;
+      double ur = -1;
+      ss >> ul >> ur;
+      if(ul < ur)
+	{
+	  ggmatrix2->SetXRangeUser(ul,ur);
+	}
+      else
+	{
+	  *fTextView<<"Invalid range."<<std::endl;
+	}
+      
+    }
+  else if(flagcommand=="g" || flagcommand=="gate")
+    {
+      std::cout<<"Command gate not defind."<<std::endl;
+    }
+  else if(flagcommand=="gm")
+    {
+      int mhit = 0;
+      double ge[100];
+      while(ss >> ge[mhit])
+	{
+	  std::cout<<"gate: "<<ge[mhit]<<std::endl;
+	  mhit++;
+	}
+      std::cout<<"mhit: "<<mhit<<std::endl;
+
+      switch(mhit)
+	{
+	case 1:
+	  ggmatrix2->ShowGatedMulti(ge[0]);
+	  break;
+	case 2:
+	  ggmatrix2->ShowGatedMulti(ge[0],ge[1]);
+	  break;
+	case 3:
+	  ggmatrix2->ShowGatedMulti(ge[0],ge[1],ge[2]);
+	  break;	  
+	case 4:
+	  ggmatrix2->ShowGatedMulti(ge[0],ge[1],ge[2],ge[3]);
+	  break;
+	case 5:
+	  ggmatrix2->ShowGatedMulti(ge[0],ge[1],ge[2],ge[3],ge[4]);
+	  break;
+	case 6:
+	  ggmatrix2->ShowGatedMulti(ge[0],ge[1],ge[2],ge[3],ge[4],ge[5]);
+	  break;
+	default:
+	  *fTextView<<"Invalid gated."<<std::endl;
+	}
+      
+    }
+  else if(flagcommand=="tpj" || flagcommand=="totalproject")
+    {
+      ggmatrix2->ShowTotalProject();
+    }
+  else if(flagcommand=="snp")
+    {
+      int n = 0;
+      ss >> n;
+      if(n > 0)
+	{
+	  ggmatrix2->SetNPeaks(n);
+	}
+      else
+	{
+	  *fTextView<<"Invalid peaks number."<<std::endl;
+	}
+    }
+  else if(flagcommand=="spw")
+    {
+      double ul = 10000;
+      double ur = -10000;
+      ss >> ul >> ur;
+      if(ul < 0 && ur > 0)
+	{
+	  ggmatrix2->SetPeakWidth(ul,ur);
+	}
+      else
+	{
+	  *fTextView<<"Invalid peak width."<<std::endl;
+	}
+    }
+  else if(flagcommand=="spt")
+    {
+      double thres = 100;
+      ss >> thres;
+      if(thres > 0 && thres <1)
+	{
+	  ggmatrix2->SetPeaksThreshold(thres);
+	}
+      else
+	{
+	  *fTextView<<"Invalid peak threshold."<<std::endl;
+	}
+    }
+  else
+    {
+      *fTextView<<"Invalid command."<<std::endl;
+    }
+  
+  
   
 
   //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -122,13 +248,3 @@ void ggMainFrame::HandleReturn()
 
 // 
 // ggMainFrame.cc ends here
-
-
-
-
-
-
-
-
-
-

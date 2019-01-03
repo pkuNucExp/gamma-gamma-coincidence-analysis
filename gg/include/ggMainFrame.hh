@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 16:46:43 2019 (+0800)
-// Last-Updated: 三 1月  2 22:20:04 2019 (+0800)
+// Last-Updated: 四 1月  3 09:14:36 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 9
+//     Update #: 10
 // URL: http://wuhongyi.cn 
 
 #ifndef _GGMAINFRAME_H_
@@ -28,6 +28,9 @@
 #include "TCanvas.h"
 #include "TString.h"
 
+#include <iostream> 
+#include <sstream>
+#include <cstring>
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 class ggMainFrame : public TGMainFrame
 {
