@@ -4,9 +4,9 @@
 # Author: Hongyi Wu(吴鸿毅)
 # Email: wuhongyi@qq.com 
 # Created: 六 2月 22 19:39:08 2014 (+0800)
-# Last-Updated: 四 1月  3 16:52:11 2019 (+0800)
+# Last-Updated: 四 1月  3 20:56:51 2019 (+0800)
 #           By: Hongyi Wu(吴鸿毅)
-#     Update #: 116
+#     Update #: 117
 # URL: http://wuhongyi.cn 
 
 #在当前目录打开终端，输入        cmake .[Enter]   make
@@ -21,7 +21,7 @@ SET(CMAKE_BUILD_TYPE Debug) #编译调试版本
 #----------------------------------------------------------------------------
 # Find ROOT (required package)
 #find_package(ROOT REQUIRED)
-find_package( ROOT COMPONENTS ASImage EG FFTW FitPanel Ged Geom Gui GuiBld GuiHtml GX11 GX11TTF Hbook Hist Html MathMore Minuit Minuit2 MLP Proof RGL RooFit RooFitCore Smatrix Spectrum Table TMVA TreePlayer TreeViewer )#COMPONENTS可选 ，REQUIRED COMPONENTS必须有
+find_package( ROOT COMPONENTS FitPanel Gui Hist Spectrum)#COMPONENTS可选 ，REQUIRED COMPONENTS必须有
 #----------------------------------------------------------------------------
 include_directories(${PROJECT_SOURCE_DIR}/include  ${ROOT_INCLUDE_DIRS})
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*)

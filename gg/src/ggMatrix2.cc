@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 20:30:37 2019 (+0800)
-// Last-Updated: 四 1月  3 13:24:25 2019 (+0800)
+// Last-Updated: 四 1月  3 20:52:58 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 37
+//     Update #: 38
 // URL: http://wuhongyi.cn 
 
 #include "ggMatrix2.hh"
@@ -117,7 +117,7 @@ void ggMatrix2::ShowGated(double ge, int icy)
   int gatel = gBinY*(ge+PeakWidthLeft-gMinY)/(gMaxY-gMinY);
   int gater = gBinY*(ge+PeakWidthRight-gMinY)/(gMaxY-gMinY);
 
-  TH1D *ha = (TH1D*)gMat->ProjectionX(TString::Format("%s_%i",ha->GetName(),ih++).Data(),gatel,gater);
+  TH1D *ha = (TH1D*)gMat->ProjectionX(TString::Format("%s_%i","Gated",ih++).Data(),gatel,gater);
   ha->SetBinContent(0,0);
   ha->SetBinContent(ha->GetNbinsX()+1,0);
 
