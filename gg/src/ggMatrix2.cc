@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 20:30:37 2019 (+0800)
-// Last-Updated: 四 1月  3 20:52:58 2019 (+0800)
+// Last-Updated: 日 1月  6 22:49:37 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 38
+//     Update #: 55
 // URL: http://wuhongyi.cn 
 
 #include "ggMatrix2.hh"
@@ -143,6 +143,12 @@ void ggMatrix2::NewCanvas(int ncy1)
   double h = 800;
   if(ncy1 == 1) h = 400;
   ca[ic] = new TCanvas(TString::Format("ca%i",ic).Data(),TString::Format("canvas%i",ic).Data(),w,h);
+  // ca[ic] = new TRootCanvas(cca[ic],TString::Format("acanvas%i",ic).Data(),w,h);
+  // ca[ic]->Connect("Closed()","ggMatrix2",this,"CanvasClose()");
+  // ca[ic]->Connect("CloseWindow()","ggMatrix2",this,"CanvasClose()");
+  // ca[ic]->InitWindow();
+  // ca[ic]->Show();
+  
   ca[ic]->Divide(1,ncy);
   for(int i = 1; i <= ncy; i++)
     {
@@ -214,6 +220,10 @@ void ggMatrix2::PeaksFlag(TH1 *h,TString st)
     }
 }
 
+void ggMatrix2::CanvasClose()
+{
+  std::cout<<"close canvas test."<<std::endl;
+}
 
 // 
 // ggMatrix2.cc ends here

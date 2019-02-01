@@ -2,23 +2,7 @@
 ## makeggmat.C
 #### makeggmat.C - Make prompt g-g coincidence matrix using RADWARE approach.
 #### Usage: root -l makeggmat.C
-### Input file: 
- Includes four branches of gamma-gamma events: caxe[hit],caxt[hit],caye[hit],cayt[hit].
- Those two branches are generated from original gamma events (ae[idet], at[idet], idet= number of det) by the following way:
- ```cpp
- int hit=0;
- for(int i=0;i<idet;i++) {
-   for(int j=0;j<idet;j++) {
-      if(i==j) continue;
-      if(ge[i]<10 || ge[j]<10 || gt[i]<10 || gt[j]<10) continue; //condition for gamma-gamma coincidence.
-      caxe[hit]=ae[i];//energy
-      caxt[hit]=at[i];//time
-      caye[hit]=ae[j];
-      cayt[hit]=aet[j];
-      hit++;
-    }
-  }
- ```   
+ 
 ### makeggmat.C:
 Following lines in the code should be modified by user
 
@@ -45,23 +29,60 @@ int dge2=3;
 //Name of input file
 TString fname="46_123gg.root";
 ```
-#### usage: root -l ge.C 
+### Functions
  ```cpp
-// Draw a gated spectrum to a new canvas.
-newcanvas() //create a canvas with (1,1)
-g(132)      //draw gate_132 to the canvas
+void setxrange(int xmin1=0, int xmax1=1500){ xmin=xmin1; xmax=xmax1;}; //set range of x-axis
+void setnpeaks(int npeaks1=30) {npeaks=npeaks1;}; //set number of peaks found in TSpecturm. 
+void setpeakwidth(double dgea=-3,double dgeb=3) {dge1=dgea;dge2=dgeb;};// set gated range: ge+dgea, ge+dgeb
+void newcanvas(int ncy=1);// create new canvas with ncy pads.
+void tpjm();//draw totoal projection spectrum 
+void tpj(int icy=1);
+TString g(double ge,int icy1=1);//draw a gated spectrum using defalut width setting.
+TString gw(double ge1,double ge2, int icy1=1);// draw a gated spectrum with specified range of ge1-ge2
+TString gand(double ge1,double ge2,double ge3=0,double ge4=0,
+	  double ge5=0,double ge6=0);// and of all spectra ge1xge2xge3... 
+TString gadd(double ge1,double ge2,double ge3=0,double ge4=0,
+	  double ge5=0,double ge6=0);// sum of all spectra  ge1+ge2+ge3...
+TString gsub(double ge1,double ge2,double ge3=0,double ge4=0,
+	     double ge5=0,double ge6=0); // substruction of spectra: ge1-ge2-ge3...
+void gm(double ge1,double ge2=0,double ge3=0,double ge4=0,
+	double ge5=0,double ge6=0);//draw multi peaks in a canvas , up to six peaks.
+void gm(TH1D* h1, TH1D *h2=NULL, TH1D *h3=NULL, TH1D *h4=NULL,
+	TH1D *h5=NULL, TH1D *h6=NULL);//show multi-gated peaks using histograms as parameters
+TString peaks(TH1 *h, Double_t thres=0.05);
+void show(){tall->ls();};//show name of all histograms
+```
+#### usage:
+ ```cpp
+1. root -l ge.C  -- total projection spectrum will show up.
+  0 1 gtpj0  [TpjPeak]
+  0 1 gtpj1  [TpjPeak]
+2.[ROOT] gm(123,234,567,897); -- draw 4 gated spectra on a canvas.
+  1 1 g123_2  [gated on ge=123.0]
+  1 2 g245_3  [gated on ge=245.0]
+  1 3 g567_4  [gated on ge=567.0]
+3.[ROOT] gand(123,245,567,867);
+  2 1 g123_5  [gated on ge=123.0]
+  2 2 g245_6  [gated on ge=245.0]
+  2 3 g567_7  [gated on ge=567.0]
+  2 4 gand0   [And gate of 123.0 245.0 567.0]
+4.[ROOT] gm(g123_5,g,g245_6,gand0)
+  3 3 g123_2  [gated on ge=123.0]
+  3 3 g245_3  [gated on ge=245.0]
+  3 3 gand0  [And gate of 123.0 245.0 567.0]
+5.[ROOT] newcanvas() //create a canvas with (1x1)
+6.[ROOT] g(132)      //draw gate_132 to the canvas
 // Draw two gated spectra to a new canvas.
-newcanvas(2) //create a cavas with （1，2）pads
-g(132,1)     //draw gate_132 to 1st. pad of the canvas
-g(152,2)     //draw gate_152 to 2nd. pad of the canvas
-// Draw a gated spectrum to current canvas.
-g(123) -- draw gate_123 to current canvas.
-// Draw gated spectra to a new canvas. -- support up to six spectra
-gm(123,234,567,897); -- draw 4 gated spectra on a canvas.
+7.[ROOT] newcanvas(2) //create a cavas with （1，2）pads
+8.[ROOT] g(132,1)     //draw gate_132 to 1st. pad of the canvas
+9.[ROOT] g(152,2)     //draw gate_152 to 2nd. pad of the canvas
 
+// Draw a gated spectrum to current canvas.
+10.[ROOT] g(123) -- draw gate_123 to current canvas.
+11.[ROOT] gw(122,125)
 // functions for setting change, all of these settings will take effect for the next drawing. 
-setxrange(0,2000);//x range of spectrum
-setnpeaks(30); // number of peaks marked in the spectrum
-setpeakwidth(-3,3); // gate width: ge-3, ge+3
+11.[ROOT] setxrange(0,2000);//x range of spectrum
+12.[ROOT] setnpeaks(30); // number of peaks marked in the spectrum
+13.[ROOT] setpeakwidth(-3,3); // gate width: ge-3, ge+3
 
 ```

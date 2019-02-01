@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 三 1月  2 20:30:18 2019 (+0800)
-// Last-Updated: 四 1月  3 13:24:23 2019 (+0800)
+// Last-Updated: 日 1月  6 22:49:37 2019 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 22
+//     Update #: 29
 // URL: http://wuhongyi.cn 
 
 #ifndef _GGMATRIX2_H_
@@ -20,6 +20,7 @@
 #include "TPolyMarker.h"
 #include "TLatex.h"
 #include "TMath.h"
+// #include "TRootCanvas.h"
 
 #include <iostream> 
 #include <sstream> 
@@ -50,11 +51,14 @@ public:
 
   
   void PeaksFlag(TH1 *h,TString st = "");
+
+  void CanvasClose();
 private:
   TH1 *gTpj;
   TH2 *gMat;
   
   TCanvas *ca[1000];
+  // TRootCanvas *ca[1000];
   int ic = -1;//canvas id
   int ih = 0;
   int ncy = 1;//number of windows in y axis
