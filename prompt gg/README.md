@@ -117,3 +117,18 @@ OBJ: TList	TList	Doubly linked list : 0
 
 ```
 
+## cube code
+
+```cpp
+// 第一个参数为三维矩阵的bin值，使用2048需要40GB内存。当然，可以通过升级程序 TH2I 为 TH2S 来减少内存暂用，这样可使用更多的bin
+// 第二个参数为能量范围
+cube *threefold = new cube(2048,4096);
+
+// Fill in all possible combinations
+threefold->Fill(ex,ey,ez);
+
+
+threefold->Save(runnumber);
+```
+
+Users can merge data through the script mergecube.sh
