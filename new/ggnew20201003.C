@@ -4,14 +4,15 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 日 9月 13 10:21:58 2020 (+0800)
-// Last-Updated: 四 10月  8 21:13:37 2020 (+0800)
+// Last-Updated: 六 10月  3 16:01:07 2020 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 65
+//     Update #: 97
 // URL: http://wuhongyi.cn 
 
 // 待添加
 // 需要添加图像清除等。把错误的选择能够清除，或者在次点击可以清除bg选择等。
 // 总投影谱中峰和本底谱的标记随图像尺寸自适应变化
+
 
 #define DATAFORMAT_M4B 0
 #define DATAFORMAT_ROOT 1
@@ -23,15 +24,14 @@
 #define ENERGYMAX 4096  //keV
 #define FILENAME_M4B  "co59.m4b"
 #elif DATAFORMAT == DATAFORMAT_ROOT//如果采用 root 格式数据，则修改以下定义
-#define FILENAME_ROOT "187Tl.root"
-#define ROOTTH2TYPE  TH2D  //可选择 TH2I TH2F TH2D
-#define ROOTTH2NAME  "hg2"
+#define FILENAME_ROOT "matr_0606.root"
+#define ROOTTH2TYPE  TH2F  //可选择 TH2I TH2F TH2D
+#define ROOTTH2NAME  "hh"
 #endif
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 // 以下程序请勿修改
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 
 #include "TCanvas.h"
 #include "TPad.h"
@@ -58,9 +58,8 @@
 #include <set>
 
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TH2 *h2=NULL;
-TH1D *h1,*htmp;
+TH2 *h2 = NULL;
+TH1D *h1,*hg,*htmp;
 TCanvas* c1;
 
 TCanvas *ca[1000];
@@ -83,8 +82,8 @@ int binx1,binx2;
 TBox *b;
 
 int npeaks=30;
-double hxmin;
-double hxmax;
+double hxmin=0;
+double hxmax=0;
 
 void tpj();
 void gate(double,double);//set peak and background bins
@@ -98,9 +97,8 @@ void gmshow(TH1* h1, TH1 *h2=NULL, TH1 *h3=NULL, TH1 *h4=NULL,TH1 *h5=NULL, TH1 
 void gandshow(TH1* h1, TH1 *h2=NULL, TH1 *h3=NULL, TH1 *h4=NULL,TH1 *h5=NULL, TH1 *h6=NULL);
 void gaddshow(TH1* h1, TH1 *h2=NULL, TH1 *h3=NULL, TH1 *h4=NULL,TH1 *h5=NULL, TH1 *h6=NULL);
 void gsubshow(TH1* h1, TH1 *h2=NULL, TH1 *h3=NULL, TH1 *h4=NULL,TH1 *h5=NULL, TH1 *h6=NULL);
-void setxrange(double hxmin1=0, double hxmax1=hxmax) {hxmin=hxmin1; hxmax=hxmax1;};
+void setxrange(double hxmin1=0, double hxmax1=2000) {hxmin=hxmin1; hxmax=hxmax1;};
 void setnpeaks(int npeaks1=30) {npeaks=npeaks1;};
-
 
 void ggnew()
 {
@@ -156,6 +154,7 @@ void ggnew()
   tpj();
 }
 
+
 void tpj()
 {
   gStyle->SetTitleAlign(33);
@@ -198,11 +197,8 @@ void gate(int gpeak1,double wgpeak=70)
   c1->Modified();
   c1->Draw();
   c1->cd();
-  int hxmin1=hxmin;
-  int hxmax1=hxmax;
   setxrange(gpeak-wgpeak,gpeak+wgpeak);
   peaks(h1);
-  setxrange(hxmin1,hxmax1);
   c1->DeleteExec("bgflag");
   c1->AddExec("gateflag","gateflag()");
   
@@ -301,8 +297,7 @@ void gateflag()
 			     gPad->GetUymin(),
 			     h->GetBinWidth(i)+h->GetBinLowEdge(i),
 			     h->GetBinContent(i));
-	  b->SetFillStyle(1001);
-	  b->SetFillColorAlpha(kRed,0.50);
+	  b->SetFillColorAlpha(kRed,0.30);
 	  b->Draw();
 
 	}
@@ -337,8 +332,7 @@ void bgflag()
 		     gPad->GetUymin(),
 		     h->GetBinWidth(binx0)+h->GetBinLowEdge(binx0),
 		     h->GetBinContent(binx0));
-    b->SetFillStyle(1001);
-  b->SetFillColorAlpha(kBlue,0.5);
+  b->SetFillColorAlpha(kBlue,0.35);
   b->Draw();
   gPad->Update();
 }
@@ -370,16 +364,12 @@ void gshow()
   c1->DeleteExec("gateflag");
   c1->DeleteExec("bgflag");
   newcanvas();//create ca[ic];
-    if(!htmp) htmp=new TH1D("hgtmp","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
+  if(!htmp) htmp=new TH1D("hgtmp","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
+  if(!hg) hg = new TH1D("hg","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
   double weight=double(peakbin.size())/bgbin.size();
 
   double peak0 = h1->GetBinCenter(*peakbin.begin());
   double peak1 = h1->GetBinCenter(*peakbin.rbegin());
-  gpeak=(peak0+peak1)/2.;
-  TString shn=Form("hg%d_%d",gpeak,ih++);
-  //如果内存空间中存在，则删除
-  TH1D *hg = new TH1D("hg","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
-  
   for(auto is=peakbin.begin();is!=peakbin.end();is++)
     {
       htmp->Reset();
@@ -393,12 +383,12 @@ void gshow()
       hg->Add(hg,htmp,1,-weight);    
     }
 
-  
+  gpeak=(peak0+peak1)/2.;
   
   ca[ic]->cd();
   TString sht=Form("gated on %d keV",gpeak);
-  
-  setxrange(0,hxmax);
+  TString shn=Form("hg%d_%d",gpeak,ih++);
+  setxrange(0,h2->GetXaxis()->GetXmax());
   peaks(hg);
   hg->SetName(shn);
   hg->SetTitle(sht);
@@ -461,8 +451,7 @@ void gateload(TString sname)
 		 h1->GetBinWidth(bin)+h1->GetBinLowEdge(bin),
 		 h1->GetBinContent(bin));
     // std::cout<<gPad->GetUymin()<<" "<<h1->GetBinContent(bin)<<std::endl;
-    b->SetFillStyle(1001);
-    b->SetFillColorAlpha(kRed,0.50);
+    b->SetFillColorAlpha(kRed,0.30);
     b->Draw();
     gPad->Update();
     cout<<bin<<endl;
@@ -477,8 +466,7 @@ void gateload(TString sname)
 		 gPad->GetUymin(),
 		 h1->GetBinWidth(bin)+h1->GetBinLowEdge(bin),
 		 h1->GetBinContent(bin));
-    b->SetFillStyle(1001);
-    b->SetFillColorAlpha(kBlue,0.50);
+    b->SetFillColorAlpha(kBlue,0.30);
     b->Draw();
     gPad->Update();
     cout<<bin<<endl;
@@ -587,16 +575,15 @@ void gandshow(TH1* h1, TH1 *h2, TH1 *h3, TH1 *h4, TH1 *h5, TH1 *h6)
 
 void peaks(TH1 *h,bool bg)
 {
-  double thres=0.0001;
+  double thres=0.001;
   h->SetLineColor(kBlue);
   h->SetFillColor(kCyan);
   h->SetAxisRange(hxmin,hxmax,"X");
-  cout<<hxmin<<" "<<hxmax<<endl;
   TSpectrum *s=new TSpectrum(500);
   if(bg) {
     for(int i=1;i<=h->GetNbinsX();i++) //set bins with negative counts to zero
       if(h->GetBinContent(i)<0)  h->SetBinContent(i,0);
-    TH1F *hb=(TH1F*)s->Background(h,10,"same");
+    TH1F *hb=(TH1F*)s->Background(h,5,"same");
     h->Add(h,hb,1,-1);
     delete hb;
   }
@@ -604,13 +591,13 @@ void peaks(TH1 *h,bool bg)
   h->SetStats(0);
   Int_t nfound=100;
   Int_t nloop=0;
-   while(1){
+   while(nloop<50){
     nfound=s->Search(h,2,"",thres);
-    if(nfound>npeaks+5) thres += 0.0005;
-    else break;
+    if(npeaks) thres += 0.002;
+    else thres -= 0.002;
+    if(thres<0 || abs(nfound-npeaks)<3 ) break;
     nloop++;
     }
-   cout<<"found "<<nfound<<" peaks."<<endl;
   TPolyMarker *pm=(TPolyMarker *)
                       h->GetListOfFunctions()->FindObject("TPolyMarker");
   pm->SetMarkerStyle(32);
@@ -625,7 +612,7 @@ void peaks(TH1 *h,bool bg)
   for(int j=0;j<nfound;j++) {
    stringstream ss;
    ss<<xpeaks[j];
-   //if(ypeaks[j]<3) continue;
+   if(ypeaks[j]<3) continue;
    TString s1=ss.str();
    TLatex *tex=new TLatex(xpeaks[j],ypeaks[j],s1);
    tex->SetTextFont(13);

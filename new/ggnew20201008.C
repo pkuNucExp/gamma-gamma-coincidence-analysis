@@ -4,7 +4,7 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 日 9月 13 10:21:58 2020 (+0800)
-// Last-Updated: 四 10月  8 21:13:37 2020 (+0800)
+// Last-Updated: 六 10月  3 18:03:40 2020 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
 //     Update #: 65
 // URL: http://wuhongyi.cn 
@@ -60,7 +60,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TH2 *h2=NULL;
-TH1D *h1,*htmp;
+TH1D *h1,*hg,*htmp;
 TCanvas* c1;
 
 TCanvas *ca[1000];
@@ -198,11 +198,8 @@ void gate(int gpeak1,double wgpeak=70)
   c1->Modified();
   c1->Draw();
   c1->cd();
-  int hxmin1=hxmin;
-  int hxmax1=hxmax;
   setxrange(gpeak-wgpeak,gpeak+wgpeak);
   peaks(h1);
-  setxrange(hxmin1,hxmax1);
   c1->DeleteExec("bgflag");
   c1->AddExec("gateflag","gateflag()");
   
@@ -371,15 +368,11 @@ void gshow()
   c1->DeleteExec("bgflag");
   newcanvas();//create ca[ic];
     if(!htmp) htmp=new TH1D("hgtmp","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
+  if(!hg) hg = new TH1D("hg","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
   double weight=double(peakbin.size())/bgbin.size();
 
   double peak0 = h1->GetBinCenter(*peakbin.begin());
   double peak1 = h1->GetBinCenter(*peakbin.rbegin());
-  gpeak=(peak0+peak1)/2.;
-  TString shn=Form("hg%d_%d",gpeak,ih++);
-  //如果内存空间中存在，则删除
-  TH1D *hg = new TH1D("hg","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
-  
   for(auto is=peakbin.begin();is!=peakbin.end();is++)
     {
       htmp->Reset();
@@ -393,11 +386,11 @@ void gshow()
       hg->Add(hg,htmp,1,-weight);    
     }
 
-  
+  gpeak=(peak0+peak1)/2.;
   
   ca[ic]->cd();
   TString sht=Form("gated on %d keV",gpeak);
-  
+  TString shn=Form("hg%d_%d",gpeak,ih++);
   setxrange(0,hxmax);
   peaks(hg);
   hg->SetName(shn);
@@ -591,7 +584,6 @@ void peaks(TH1 *h,bool bg)
   h->SetLineColor(kBlue);
   h->SetFillColor(kCyan);
   h->SetAxisRange(hxmin,hxmax,"X");
-  cout<<hxmin<<" "<<hxmax<<endl;
   TSpectrum *s=new TSpectrum(500);
   if(bg) {
     for(int i=1;i<=h->GetNbinsX();i++) //set bins with negative counts to zero
@@ -625,7 +617,7 @@ void peaks(TH1 *h,bool bg)
   for(int j=0;j<nfound;j++) {
    stringstream ss;
    ss<<xpeaks[j];
-   //if(ypeaks[j]<3) continue;
+   if(ypeaks[j]<3) continue;
    TString s1=ss.str();
    TLatex *tex=new TLatex(xpeaks[j],ypeaks[j],s1);
    tex->SetTextFont(13);
