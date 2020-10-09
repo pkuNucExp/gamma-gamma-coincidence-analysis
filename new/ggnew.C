@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 日 9月 13 10:21:58 2020 (+0800)
-// Last-Updated: 四 10月  8 21:13:37 2020 (+0800)
+// Last-Updated: 五 10月  9 19:14:27 2020 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 65
+//     Update #: 71
 // URL: http://wuhongyi.cn 
 
 // 待添加
@@ -68,7 +68,6 @@ int ic=-1;//canvas id
 int icy=1;
 int ncy=1;//number of windows in y axis
 
-int ih=0;
 int ihadd=0;
 int ihsub=0;
 int ihand=0;
@@ -376,9 +375,15 @@ void gshow()
   double peak0 = h1->GetBinCenter(*peakbin.begin());
   double peak1 = h1->GetBinCenter(*peakbin.rbegin());
   gpeak=(peak0+peak1)/2.;
-  TString shn=Form("hg%d_%d",gpeak,ih++);
-  //如果内存空间中存在，则删除
+  TString shn=Form("hg%d",gpeak);
+  TString sht=Form("gated on %d keV",gpeak);
+  
+  TH1D *ggg = (TH1D*)gROOT->FindObject(shn.Data());
+  if(ggg!=NULL) delete ggg; //如果内存空间中存在，则删除
+
   TH1D *hg = new TH1D("hg","",h2->GetXaxis()->GetNbins(),0,h2->GetXaxis()->GetXmax());
+  hg->SetName(shn);
+  hg->SetTitle(sht);
   
   for(auto is=peakbin.begin();is!=peakbin.end();is++)
     {
@@ -393,15 +398,10 @@ void gshow()
       hg->Add(hg,htmp,1,-weight);    
     }
 
-  
-  
   ca[ic]->cd();
-  TString sht=Form("gated on %d keV",gpeak);
-  
   setxrange(0,hxmax);
   peaks(hg);
-  hg->SetName(shn);
-  hg->SetTitle(sht);
+
   ca[ic]->Draw();
 }
 
