@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 五 1月 15 19:24:59 2021 (+0800)
-// Last-Updated: 五 1月 15 20:23:13 2021 (+0800)
+// Last-Updated: 六 1月 16 14:56:47 2021 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 10
+//     Update #: 15
 // URL: http://wuhongyi.cn 
 
 
@@ -67,7 +67,7 @@ TH2 *h22 = NULL;
 void ggsee()
 {
 
-
+  // gStyle->SetCanvasPreferGL(kTRUE);
 
 #if DATAFORMAT == DATAFORMAT_M4B
   h2 = new TH2D("h2","",BINNUMBER,0,ENERGYMAX,BINNUMBER,0,ENERGYMAX);
@@ -106,6 +106,9 @@ void tpj()
 
 
   if(!c2) { c2 = new TCanvas("c2","c2"); }
+  c2->cd();
+  h22 = (ROOTTH2TYPE *)h2->Clone("h22");
+  h22->Draw("surf2");
 }
 
 void pointflag()
@@ -125,14 +128,14 @@ void pointflag()
   int py = gPad->GetEventY();
 
 
-  float uxmin = gPad->GetUxmin();
-  float uxmax = gPad->GetUxmax();
-  float uymin = gPad->GetUymin();
-  float uymax = gPad->GetUymax();
-  int pxmin = gPad->XtoAbsPixel(uxmin);
-  int pxmax = gPad->XtoAbsPixel(uxmax);
-  int pymin = gPad->YtoAbsPixel(uymin);
-  int pymax = gPad->YtoAbsPixel(uymax);
+  // float uxmin = gPad->GetUxmin();
+  // float uxmax = gPad->GetUxmax();
+  // float uymin = gPad->GetUymin();
+  // float uymax = gPad->GetUymax();
+  // int pxmin = gPad->XtoAbsPixel(uxmin);
+  // int pxmax = gPad->XtoAbsPixel(uxmax);
+  // int pymin = gPad->YtoAbsPixel(uymin);
+  // int pymax = gPad->YtoAbsPixel(uymax);
       
   Float_t upx = gPad->AbsPixeltoX(px);
   Float_t upy = gPad->AbsPixeltoY(py);
@@ -141,12 +144,6 @@ void pointflag()
   std::cout<<"px: "<<upx<<"   py:"<<upy<<std::endl;
 
   c2->cd();
-  if(h22!=NULL)
-    {
-      delete h22;
-      h22 = NULL;
-    }
-  h22 = (ROOTTH2TYPE *)h2->Clone("h22");
   h22->GetXaxis()->SetRangeUser(upx-10,upx+10);
   h22->GetYaxis()->SetRangeUser(upy-10,upy+10);
   h22->Draw("surf2");
@@ -161,18 +158,3 @@ void pointflag()
 
 // 
 // ggsee.cc ends here
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
