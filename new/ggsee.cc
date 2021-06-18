@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 五 1月 15 19:24:59 2021 (+0800)
-// Last-Updated: 六 1月 16 14:56:47 2021 (+0800)
+// Last-Updated: 五 6月 18 21:34:12 2021 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 15
+//     Update #: 26
 // URL: http://wuhongyi.cn 
 
 
@@ -63,54 +63,6 @@ TCanvas* c2;
 TH2 *h2 = NULL;
 TH2 *h22 = NULL;
 
-
-void ggsee()
-{
-
-  // gStyle->SetCanvasPreferGL(kTRUE);
-
-#if DATAFORMAT == DATAFORMAT_M4B
-  h2 = new TH2D("h2","",BINNUMBER,0,ENERGYMAX,BINNUMBER,0,ENERGYMAX);
-  uint data;
-  std::ifstream readdata(FILENAME_M4B,std::ios::binary);
-  for (int i = 1; i <= BINNUMBER; ++i)
-    for (int j = 1; j <= BINNUMBER; ++j)
-      {
-	readdata.read((char*)&data,sizeof(uint));
-	if(data > 0)
-	  {
-	    h2->SetBinContent(i,j,data);
-	  }
-      }
-  readdata.close();
-#elif DATAFORMAT == DATAFORMAT_ROOT
-  TFile *fin=new TFile(FILENAME_ROOT);
-  h2=(ROOTTH2TYPE*)fin->Get(ROOTTH2NAME);
-  h2->ClearUnderflowAndOverflow();
-#endif
-
-  
-
-  
-
-}
-
-
-void tpj()
-{
-  if(!c1) { c1 = new TCanvas("c1","g-g matrix"); }
-  c1->cd();
-  h2->Draw("colz");
-  c1->Draw();
-  c1->AddExec("pointflag","pointflag()");
-
-
-  if(!c2) { c2 = new TCanvas("c2","c2"); }
-  c2->cd();
-  h22 = (ROOTTH2TYPE *)h2->Clone("h22");
-  h22->Draw("surf2");
-}
-
 void pointflag()
 {
   int pe = gPad->GetEvent();
@@ -151,7 +103,65 @@ void pointflag()
   c2->Modified();
   c2->Update();
   gSystem->ProcessEvents();
+
+  c1->cd();
+  // c1->DeleteExec("pointflag");
   
+  // gSystem->ProcessEvents();
+  // c1->AddExec("pointflag","pointflag()");
+  // gSystem->ProcessEvents();
+}
+
+void tpj()
+{
+  if(!c1) { c1 = new TCanvas("c1","g-g matrix"); }
+  c1->cd();
+  h2->Draw("colz");
+  c1->Draw();
+  // c1->AddExec("pointflag","pointflag()");
+
+  if(!c2) { c2 = new TCanvas("c2","c2"); }
+  c2->cd();
+  h22 = (ROOTTH2TYPE *)h2->Clone("h22");
+  h22->Draw("surf2");
+
+}
+
+void pf()
+{
+  c1->AddExec("pointflag","pointflag()");
+}
+
+
+void ggsee()
+{
+
+  // gStyle->SetCanvasPreferGL(kTRUE);
+
+#if DATAFORMAT == DATAFORMAT_M4B
+  h2 = new TH2D("h2","",BINNUMBER,0,ENERGYMAX,BINNUMBER,0,ENERGYMAX);
+  uint data;
+  std::ifstream readdata(FILENAME_M4B,std::ios::binary);
+  for (int i = 1; i <= BINNUMBER; ++i)
+    for (int j = 1; j <= BINNUMBER; ++j)
+      {
+	readdata.read((char*)&data,sizeof(uint));
+	if(data > 0)
+	  {
+	    h2->SetBinContent(i,j,data);
+	  }
+      }
+  readdata.close();
+#elif DATAFORMAT == DATAFORMAT_ROOT
+  TFile *fin=new TFile(FILENAME_ROOT);
+  h2=(ROOTTH2TYPE*)fin->Get(ROOTTH2NAME);
+  h2->ClearUnderflowAndOverflow();
+#endif
+
+  
+
+  tpj();
+
 }
 
 
