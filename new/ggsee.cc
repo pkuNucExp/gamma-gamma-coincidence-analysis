@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 五 1月 15 19:24:59 2021 (+0800)
-// Last-Updated: 五 6月 18 21:34:12 2021 (+0800)
+// Last-Updated: 六 6月 19 20:47:12 2021 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 26
+//     Update #: 33
 // URL: http://wuhongyi.cn 
 
 
@@ -63,6 +63,45 @@ TCanvas* c2;
 TH2 *h2 = NULL;
 TH2 *h22 = NULL;
 
+double movecenterx = 10;
+double movecentery = 10;
+double halfgatewidth = 10;
+
+void setcenterx(double x = 10)
+{
+  movecenterx = x;
+}
+
+void setcentery(double y = 10)
+{
+  movecentery = y;
+}
+
+void sethalfgate(double g = 10)
+{
+  halfgatewidth = g;
+}
+
+void xpp()
+{
+  movecenterx += 1.75*halfgatewidth;
+}
+
+void xmm()
+{
+  movecenterx -= 1.75*halfgatewidth;
+}
+
+void ypp()
+{
+  movecentery += 1.75*halfgatewidth;
+}
+
+void ymm()
+{
+  movecentery -= 1.75*halfgatewidth;
+}
+
 void pointflag()
 {
   int pe = gPad->GetEvent();
@@ -105,7 +144,7 @@ void pointflag()
   gSystem->ProcessEvents();
 
   c1->cd();
-  // c1->DeleteExec("pointflag");
+  c1->DeleteExec("pointflag");
   
   // gSystem->ProcessEvents();
   // c1->AddExec("pointflag","pointflag()");
@@ -123,6 +162,8 @@ void tpj()
   if(!c2) { c2 = new TCanvas("c2","c2"); }
   c2->cd();
   h22 = (ROOTTH2TYPE *)h2->Clone("h22");
+  h22->GetXaxis()->SetTitle("x axis [keV]");
+  h22->GetYaxis()->SetTitle("y axis [keV]");
   h22->Draw("surf2");
 
 }
@@ -132,6 +173,16 @@ void pf()
   c1->AddExec("pointflag","pointflag()");
 }
 
+void sn(int i = 1)//show next
+{
+  c2->cd();
+  h22->GetXaxis()->SetRangeUser(movecenterx-i*halfgatewidth,movecenterx+i*halfgatewidth);
+  h22->GetYaxis()->SetRangeUser(movecentery-i*halfgatewidth,movecentery+i*halfgatewidth);
+  h22->Draw("surf2");
+
+  c2->Modified();
+  c2->Update();
+}
 
 void ggsee()
 {
@@ -158,7 +209,8 @@ void ggsee()
   h2->ClearUnderflowAndOverflow();
 #endif
 
-  
+  h2->GetXaxis()->SetTitle("x axis [keV]");
+  h2->GetYaxis()->SetTitle("y axis [keV]");
 
   tpj();
 
