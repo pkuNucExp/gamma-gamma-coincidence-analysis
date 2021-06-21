@@ -4,9 +4,9 @@
 // Author: Hongyi Wu(吴鸿毅)
 // Email: wuhongyi@qq.com 
 // Created: 五 1月 15 19:24:59 2021 (+0800)
-// Last-Updated: 六 6月 19 20:47:12 2021 (+0800)
+// Last-Updated: 一 6月 21 11:40:25 2021 (+0800)
 //           By: Hongyi Wu(吴鸿毅)
-//     Update #: 33
+//     Update #: 34
 // URL: http://wuhongyi.cn 
 
 
@@ -178,6 +178,17 @@ void sn(int i = 1)//show next
   c2->cd();
   h22->GetXaxis()->SetRangeUser(movecenterx-i*halfgatewidth,movecenterx+i*halfgatewidth);
   h22->GetYaxis()->SetRangeUser(movecentery-i*halfgatewidth,movecentery+i*halfgatewidth);
+  h22->Draw("surf2");
+
+  c2->Modified();
+  c2->Update();
+}
+
+void gate(double r1, double r2)
+{
+  c2->cd();
+  h22->GetXaxis()->SetRangeUser(h22->GetXaxis()->GetXmin(),h22->GetXaxis()->GetXmax());
+  h22->GetYaxis()->SetRangeUser(r1, r2);
   h22->Draw("surf2");
 
   c2->Modified();
